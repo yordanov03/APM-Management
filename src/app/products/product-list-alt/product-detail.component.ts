@@ -3,7 +3,7 @@ import { Supplier } from '../../suppliers/supplier';
 import { Product } from '../product';
 
 import { ProductService } from '../product.service';
-import { EMPTY, catchError } from 'rxjs';
+import { EMPTY, Subject, catchError } from 'rxjs';
 
 @Component({
   selector: 'pm-product-detail',
@@ -11,14 +11,16 @@ import { EMPTY, catchError } from 'rxjs';
 })
 export class ProductDetailComponent {
   pageTitle = 'Product Detail';
-  errorMessage = '';
+  private errorMessageSubject = new Subject<string>();
+  errorMessage$ = this.errorMessageSubject.asObservable();
+
   productSuppliers: Supplier[] | null = null;
 
   constructor(private productService: ProductService) { }
 
   product$ = this.productService.selectedProduct$.pipe(
     catchError(err=>{
-      this.errorMessage = err;
+      this.errorMessageSubject.next(err)
       return EMPTY
     })
   )
