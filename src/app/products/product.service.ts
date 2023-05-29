@@ -5,6 +5,7 @@ import { BehaviorSubject, catchError, combineLatest, filter, map, merge, Observa
 
 import { Product } from './product';
 import { ProductCategoryService } from '../product-categories/product-category.service';
+import { SupplierService } from '../suppliers/supplier.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class ProductService {
       price: product.price? product.price * 1.5 : 0,
       searchKey: [product.productName]}as Product)
     )),
-    tap(data => console.log('Products: ', JSON.stringify(data))),
+    // tap(data => console.log('Products: ', JSON.stringify(data))),
     catchError(this.handleError)
   );
 
@@ -64,7 +65,8 @@ export class ProductService {
   )
   
   constructor(private http: HttpClient,
-    private productCategoryService: ProductCategoryService) { }
+    private productCategoryService: ProductCategoryService,
+    private supplierService: SupplierService) { }
 
     addProduct(newProduct? : Product){
       newProduct = newProduct || this.fakeProduct();
