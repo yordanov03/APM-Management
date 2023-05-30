@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
-import { throwError, Observable, of, map, tap, concatMap, mergeMap, switchMap } from 'rxjs';
+import { throwError, Observable, of, map, tap, concatMap, mergeMap, switchMap, shareReplay, catchError } from 'rxjs';
 import { Supplier } from './supplier';
 
 @Injectable({
@@ -10,27 +10,34 @@ import { Supplier } from './supplier';
 export class SupplierService {
   suppliersUrl = 'api/suppliers';
 
-  suppliersWithMap$ = of(1,5,8)
+  // suppliersWithMap$ = of(1,5,8)
+  // .pipe(
+  //   map (id=>this.http.get<Supplier>(`${this.suppliersUrl}/${id}`))
+  // )
+
+  // suppliersWithConcatMap$ = of(1,5,8)
+  // .pipe(
+  //   tap(id=> console.log('concatMap source observable', id)),
+  //   concatMap(id=> this.http.get<Supplier>(`${this.suppliersUrl}/${id}`)))
+
+  //   suppliersWithMergeMap$ = of(1,5,8)
+  //   .pipe(
+  //     tap(id=> console.log('mergeMap source observable', id)),
+  //     mergeMap(id=> this.http.get<Supplier>(`${this.suppliersUrl}/${id}`))
+  //   )
+
+  //   suppliersWithSwitchMap$ = of(1,5,8)
+  //   .pipe(
+  //     tap(id=> console.log('swithMap source observable', id)),
+  //     switchMap(id=> this.http.get<Supplier>(`${this.suppliersUrl}/${id}`))
+  //   )
+
+  suppliers$ = this.http.get<Supplier[]>(this.suppliersUrl)
   .pipe(
-    map (id=>this.http.get<Supplier>(`${this.suppliersUrl}/${id}`))
+    tap(data=> console.log('suppliers', JSON.stringify(data))),
+    shareReplay(1),
+    catchError(this.handleError)
   )
-
-  suppliersWithConcatMap$ = of(1,5,8)
-  .pipe(
-    tap(id=> console.log('concatMap source observable', id)),
-    concatMap(id=> this.http.get<Supplier>(`${this.suppliersUrl}/${id}`)))
-
-    suppliersWithMergeMap$ = of(1,5,8)
-    .pipe(
-      tap(id=> console.log('mergeMap source observable', id)),
-      mergeMap(id=> this.http.get<Supplier>(`${this.suppliersUrl}/${id}`))
-    )
-
-    suppliersWithSwitchMap$ = of(1,5,8)
-    .pipe(
-      tap(id=> console.log('swithMap source observable', id)),
-      switchMap(id=> this.http.get<Supplier>(`${this.suppliersUrl}/${id}`))
-    )
 
   constructor(private http: HttpClient) {
   //  this.suppliersWithConcatMap$.subscribe(item => console.log('concatMap result', item));
